@@ -1,11 +1,11 @@
 /*
-* Done with globe and country borders
-* Now, looking for a higher-res globe texture, maybe
-* Also need to get data for all states of the US, and maybe other large countries like Russia, Canada, etc
-* Gotta configure some type of networking and listening for data from a server, so as to update the sticks in real time
-* Add labels to countries and sticks?
-* Make sticks' length represent a number (people or some such)
-* Change appearance of sticks to signify important notifications (errors, closed deals, etc)
+* TODO Done with globe and country borders
+* TODO Now, looking for a higher-res globe texture, maybe
+* TODO Also need to get data for all states of the US, and maybe other large countries like Russia, Canada, etc
+* TODO Gotta configure some type of networking and listening for data from a server, so as to update the sticks in real time
+* TODO Add labels to countries and sticks?
+* TODO Make sticks' length represent a number (people or some such)
+* TODO Change appearance of sticks to signify important notifications (errors, closed deals, etc)
 */
 
 shp("maps/TM_WORLD_BORDERS-0.3").then(function (geojson) {
@@ -13,7 +13,7 @@ shp("maps/TM_WORLD_BORDERS-0.3").then(function (geojson) {
 });
 
 let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 50);
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.01, 10);
 camera.position.z = 2;
 
 let renderer = new THREE.WebGLRenderer({antialias: true});
@@ -23,7 +23,7 @@ renderer.setClearColor(0x000000, 1);
 document.body.appendChild(renderer.domElement);
 
 // rotation by mouse click
-new THREE.OrbitControls(camera, renderer.domElement);
+new THREE.OrbitControls(camera, renderer.domElement).rotateSpeed = 0.3;
 
 // lights
 const lights = [];
@@ -92,7 +92,8 @@ function addBordersToScene(geojson) {
 			let coordinates = [];
 
 			// every point of the border of the part
-			for (let k = 0; k < part.length; k++) {
+			// change the increment in k to skip points when creating borders - improves performance, but hurts straight-line borders like Egypt, Alaska, etc
+			for (let k = 0; k < part.length; k += 1) {
 				let coords = part[k];
 				let lat = coords[1] * Math.PI / 180;
 				let lng = coords[0] * Math.PI / 180;
