@@ -1,19 +1,19 @@
 /*
-* TODO Done with globe and country borders
+* Done with globe and country borders
 * TODO Now, looking for a higher-res globe texture, maybe
-* TODO Also need to get data for all states of the US, and maybe other large countries like Russia, Canada, etc
+* Also need to get data for all states of the US, and maybe other large countries like Russia, Canada, etc
 * TODO Gotta configure some type of networking and listening for data from a server, so as to update the sticks in real time
 * TODO Add labels to countries and sticks?
 * TODO Make sticks' length represent a number (people or some such)
 * TODO Change appearance of sticks to signify important notifications (errors, closed deals, etc)
 */
 
-shp("maps/TM_WORLD_BORDERS-0.3").then(function (geojson) {
-	addBordersToScene(geojson);
-});
+// load borders
+shp("maps/TM_WORLD_BORDERS-0.3").then(addBordersToScene);
+shp("maps/state/state_bounds").then(addBordersToScene);
 
 let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.01, 10);
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.01, 5); // set the far value at 1.55 to not render the back of the globe
 camera.position.z = 2;
 
 let renderer = new THREE.WebGLRenderer({antialias: true});
@@ -37,9 +37,10 @@ scene.add( lights[ 0 ] );
 scene.add( lights[ 1 ] );
 scene.add( lights[ 2 ] );
 
+let markerMaterial = new THREE.LineBasicMaterial({color: 0x9ff9ff});
+
 // equator, parallels, and meridians
 function addMarkers(numParallels, numMeridians) {
-	let markerMaterial = new THREE.LineBasicMaterial({color: 0xeffeff});
 	let equatorGeometry = new THREE.CircleGeometry(1, 360);
 	equatorGeometry.vertices.shift();
 
@@ -48,7 +49,7 @@ function addMarkers(numParallels, numMeridians) {
 	equatorMesh.rotation.x = Math.PI/2;
 	scene.add(equatorMesh);
 
-	// latitudes
+	// parallels
 	for (let i = 0; i < Math.PI/2; i+= Math.PI/2/(numParallels+1)) {
 		let parallelGeometry = new THREE.CircleGeometry(Math.cos(i), 360);
 		parallelGeometry.vertices.shift();
@@ -113,7 +114,7 @@ function addBordersToScene(geojson) {
 let earth = new THREE.Group();
 let texLoader = new THREE.TextureLoader();
 texLoader.load("img/earthnight8k.jpg", function(tex) {
-	let geometry = new THREE.SphereGeometry(1, 360, 180);
+	let geometry = new THREE.SphereGeometry(0.999999, 360, 180);
 	let material = new THREE.MeshBasicMaterial({map: tex, overdraw: 0.5/*color: 0x050505*/});
 	let mesh = new THREE.Mesh(geometry, material);
 	mesh.rotateY(3*Math.PI/2);
